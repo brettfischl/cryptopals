@@ -34,7 +34,7 @@ func main() {
 		panic(err)
 	}
 
-	finalStr := lib.StringFromSingleByteXOR(bytes, 256)
+	finalStr, _ := lib.StringFromSingleByteXOR(bytes, 256)
 	fmt.Println(finalStr)
 	return
 }

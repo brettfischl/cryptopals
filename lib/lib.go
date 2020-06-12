@@ -1,9 +1,12 @@
 package lib
 
 import (
+	"bufio"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"log"
+	"os"
 )
 
 var LetterFrequency = map[string]float64{
@@ -36,6 +39,21 @@ var LetterFrequency = map[string]float64{
 	" ": .13000,
 }
 
+func ReadFile(path string) []byte {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	scan := bufio.NewScanner(file)
+	bytes := make([]byte, 0, 1024)
+
+	for scan.Scan() {
+		input := scan.Bytes()
+		bytes = append(bytes, input...)
+	}
+	return bytes
+}
+
 func ScoreString(str string) float64 {
 	var score float64
 	for _, char := range str {
@@ -52,7 +70,7 @@ func SingleXOR(bytes []byte, single byte) []byte {
 	return finalBytes
 }
 
-func StringFromSingleByteXOR(bytes []byte, length int) string {
+func StringFromSingleByteXOR(bytes []byte, length int) (string, byte) {
 	var topScore float64
 	var topByte int
 	for i := 0; i < length; i++ {
@@ -64,7 +82,7 @@ func StringFromSingleByteXOR(bytes []byte, length int) string {
 		}
 	}
 
-	return string(SingleXOR(bytes, byte(topByte)))
+	return string(SingleXOR(bytes, byte(topByte))), byte(topByte)
 }
 
 func FixedXOR(bytes1, bytes2 []byte) ([]byte, error) {
@@ -102,4 +120,21 @@ func DecryptRotatingKeyXOR(cipherBytes []byte, key string) string {
 	}
 
 	return string(decryptedBytes)
+}
+
+func RepeatingKeyXOR(bytes []byte, key string) []byte {
+	var cipherBytes []byte
+	keyBytes := []byte(key)
+	keyLength := len(keyBytes)
+	keyIdx := 0
+	for i := range bytes {
+		newCipherBytes := bytes[i] ^ keyBytes[keyIdx]
+		cipherBytes = append(cipherBytes, newCipherBytes)
+		keyIdx += 1
+		if keyIdx == keyLength {
+			keyIdx = 0
+		}
+	}
+
+	return cipherBytes
 }

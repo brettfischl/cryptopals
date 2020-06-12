@@ -24,7 +24,7 @@ func main() {
 			panic(err)
 		}
 
-		finalStr := lib.StringFromSingleByteXOR(bytes, 256)
+		finalStr, _ := lib.StringFromSingleByteXOR(bytes, 256)
 		linesWithScores[finalStr] = lib.ScoreString(finalStr)
 	}
 
