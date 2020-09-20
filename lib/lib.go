@@ -2,9 +2,11 @@ package lib
 
 import (
 	"bufio"
+	"crypto/aes"
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 )
@@ -137,4 +139,21 @@ func RepeatingKeyXOR(bytes []byte, key string) []byte {
 	}
 
 	return cipherBytes
+}
+
+func DecryptAES128ECB(cipherText, key []byte) []byte {
+	keyLength := len(key)
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	plainText := make([]byte, len(cipherText))
+
+	for i := 0; i < len(cipherText); i += keyLength {
+		block.Decrypt(plainText[i:i+keyLength], cipherText[i:i+keyLength])
+	}
+
+	return plainText
 }
